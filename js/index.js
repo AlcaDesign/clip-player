@@ -192,7 +192,10 @@ window.addEventListener('load', () => {
 		.map(n => n.split('=').map(decodeURIComponent))
 		.reduce((p, n) => (p[n[0]] = n[1] || '', p), {});
 	
-	muted = [ 'true', '', '1', 't' ].includes((qs.muted || qs.mute).toLowerCase());
+	let mutedByQS = qs.muted || qs.mute;
+	if(mutedByQS !== undefined) {
+		muted = [ 'true', '', '1', 't' ].includes(mutedByQS.toLowerCase());
+	}
 	
 	chatClient = new tmi.client({
 			connection: {
