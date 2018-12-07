@@ -1,0 +1,20 @@
+{
+  "name": "clip-player",
+  "version": "1.0.1",
+  "description": "Links to Clips that are posted in the chat will automatically queue and play on the stream.",
+  "main": "",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AlcaDesign/clip-player.git"
+  },
+  "keywords": [ "twitch", "chat", "clips", "stream", "embed", "overlay" ],
+  "author": "Jacob Foster",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/AlcaDesign/clip-player/issues"
+  },
+  "homepage": "https://github.com/AlcaDesign/clip-player#readme"
+}
