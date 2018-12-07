@@ -109,7 +109,7 @@ async function messageReceived(channel, userstate, message, self) {
 			return;
 		}
 		let args = message.slice(1).split(' ');
-		let commandName = args.shift();
+		let commandName = args.shift().toLowerCase();
 		if(isSupreme && commandName === 'clipreload') {
 			location.reload();
 		}
