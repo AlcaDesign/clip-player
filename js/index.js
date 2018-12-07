@@ -5,6 +5,7 @@ let attachmentPoint = document.getElementById('clip-attachment');
 let clipEmbed;
 let isEnabled = true;
 let muted = false;
+let subRequired = false;
 let currentClipData = null;
 let clipQueue = [];
 let clipIsPlaying = false;
@@ -105,12 +106,17 @@ function getUser(id) {
 	return helix('users', { id });
 }
 
-async function messageReceived(channel, userstate, message, self) {
-	if(self || ignoreNames.includes(userstate.username)) return;
+async function messageReceived(channel, user, message, self) {
+	if(self || ignoreNames.includes(user.username)) {
+		return;
+	}
+	let isBroadcaster = user.username === channel.slice(1);
+	let isMod = user.mod || user['user-type'] === 'mod';
+	let isModUp = isMod || isBroadcaster;
+	let isSub = user.subscriber || user.sub || user['user-type'] === 'sub';
+	let isSubUp = isSub || isModUp;
 	if(message[0] === '!') {
-		let isBroadcaster = userstate.username === channel.slice(1);
-		let isMod = userstate.mod || userstate['user-type'] === 'mod';
-		let isSupreme = userstate.username === 'alca' || isBroadcaster;
+		let isSupreme = user.username === 'alca' || isBroadcaster;
 		if(!(isMod || isSupreme)) {
 			return;
 		}
@@ -119,6 +125,9 @@ async function messageReceived(channel, userstate, message, self) {
 		if(isSupreme && commandName === 'clipreload') {
 			location.reload();
 		}
+		
+		// Mod commands
+
 		else if(commandName === 'forceclip') {
 			let clipMatch = args[0].match(clipsRegex);
 			if(clipMatch === null) {
@@ -131,12 +140,11 @@ async function messageReceived(channel, userstate, message, self) {
 			}
 			playClip(clipData);
 		}
-		
-		// Mod commands
-		
+
 		else if([ 'clipskip', 'skipclip' ].includes(commandName)) {
 			closeClip();
 		}
+
 		else if([ 'cliptoggle', 'toggleclip' ].includes(commandName)) {
 			isEnabled ^= 1;
 		}
@@ -146,6 +154,22 @@ async function messageReceived(channel, userstate, message, self) {
 		else if([ 'clipdisable', 'disableclip' ].includes(commandName)) {
 			isEnabled = false;
 		}
+
+		else if([ 'clipsubonly', 'subonlyclip' ].includes(commandName)) {
+			if(!args.length) {
+				subRequired ^= 1;
+			}
+			else if([ 'enable', 'on', 'enabled', 'start' ].includes(args[0])) {
+				subRequired = true;
+			}
+			else if([ 'disable', 'off', 'disabled', 'stop' ].includes(args[0])) {
+				subRequired = false;
+			}
+			else {
+				subRequired ^= 1;
+			}
+		}
+
 		else if([
 			'clipmutetoggle', 'cliptogglemute', 'togglemuteclip',
 			'toggleclipmute', 'mutetoggleclip', 'mutecliptoggle'
@@ -166,6 +190,9 @@ async function messageReceived(channel, userstate, message, self) {
 		}
 	}
 	else if(isEnabled && clipsRegex.test(message)) {
+		if(subRequired && !isSubUp) {
+			return;
+		}
 		let clipMatch = message.match(clipsRegex);
 		if(clipMatch === null) {
 			return;
@@ -179,7 +206,7 @@ async function messageReceived(channel, userstate, message, self) {
 		// if(!broadcasterData || broadcasterData.) {
 		// 	return;
 		// }
-		if(clipData.broadcaster.id !== userstate['room-id']) {
+		if(clipData.broadcaster.id !== user['room-id']) {
 			return;
 		}
 		playClip(clipData);
@@ -192,9 +219,15 @@ window.addEventListener('load', () => {
 		.map(n => n.split('=').map(decodeURIComponent))
 		.reduce((p, n) => (p[n[0]] = n[1] || '', p), {});
 	
+	let truthyValues = [ 'true', '', '1', 't' ];
 	let mutedByQS = qs.muted || qs.mute;
 	if(mutedByQS !== undefined) {
-		muted = [ 'true', '', '1', 't' ].includes(mutedByQS.toLowerCase());
+		muted = truthyValues.includes(mutedByQS.toLowerCase());
+	}
+
+	let subRequiredQS = qs['sub-required'] || qs['sub-only'] || qs.subrequired || qs.subonly;
+	if(subRequiredQS !== undefined) {
+		subRequired = truthyValues.includes(subRequiredQS.toLowerCase());
 	}
 	
 	chatClient = new tmi.client({
