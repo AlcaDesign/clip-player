@@ -14,7 +14,7 @@ let clipClearWait = null;
 let clipClearClose = null;
 let chatClient;
 
-let ignoreNames = [ 'nightbot', 'redickulousnessbot' ];
+let ignoreNames = [ 'nightbot', 'moobot' ];
 
 function playClip(clipData) {
 	if(clipIsPlaying) {
@@ -111,20 +111,22 @@ async function messageReceived(channel, user, message, self) {
 	let isSub = user.subscriber || user.sub || user['user-type'] === 'sub';
 	let isSubUp = isSub || isModUp;
 	if(message[0] === '!') {
-		let isSupreme = user.username === 'alca' || isBroadcaster;
-		if(!(isMod || isSupreme)) {
+		// let isSupreme = user.username === 'alca' || isBroadcaster;
+		// if(!(isMod || isSupreme)) {
+		if(!isModUp) {
 			return;
 		}
 		let args = message.slice(1).split(' ');
 		let commandName = args.shift().toLowerCase();
 		let [ arg0 ] = args;
-		if(isSupreme && commandName === 'clipreload') {
-			location.reload();
-		}
+		// Testing purposes
+		// if(isSupreme && commandName === 'clipreload') {
+		// 	location.reload();
+		// }
 		
 		// Mod commands
 
-		else if(commandName === 'forceclip') {
+		if(commandName === 'forceclip') {
 			let clipMatch = args[0].match(clipsRegex);
 			if(clipMatch === null) {
 				return;
@@ -217,7 +219,13 @@ window.addEventListener('load', () => {
 			return null;
 		};
 	
+	let channel = getQS('channel');
+	if(!channel) {
+		return;
+	}
+
 	let truthyValues = [ 'true', '', '1', 't' ];
+
 	let mutedByQS = getQS('muted', 'mute');
 	if(mutedByQS !== null) {
 		muted = truthyValues.includes(mutedByQS.toLowerCase());
@@ -236,7 +244,7 @@ window.addEventListener('load', () => {
 				reconnect: true,
 				secure: true
 			},
-			channels: [ getQS('channel') || 'pootie33' ]
+			channels: [ channel ]
 		});
 	chatClient.on('join', (channel, user, self) =>
 			self && console.log('JOIN', channel)
