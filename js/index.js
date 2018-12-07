@@ -1,5 +1,6 @@
 const clipsRegex = /(?:twitch.tv\/\w+\/clip\/|clips.twitch.tv\/)(\w{3,})/i;
 
+let qs;
 let attachmentPoint = document.getElementById('clip-attachment');
 let clipEmbed;
 let isEnabled = true;
@@ -161,10 +162,10 @@ async function messageReceived(channel, userstate, message, self) {
 }
 
 window.addEventListener('load', () => {
-	let qs = !location.search.length ? {} : location.search.slice(1)
+	qs = !location.search.length ? {} : location.search.slice(1)
 		.split('&')
 		.map(n => n.split('=').map(decodeURIComponent))
-		.reduce((p, n) => (p[n[0]] = n[1], p), {});
+		.reduce((p, n) => (p[n[0]] = n[1] || '', p), {});
 	
 	chatClient = new tmi.client({
 			connection: {
