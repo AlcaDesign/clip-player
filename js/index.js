@@ -18,6 +18,12 @@ let ignoreNames = [ 'nightbot', 'moobot' ];
 
 function playClip(clipData) {
 	if(clipIsPlaying) {
+		if(
+			clipData.slug === currentClipData.slug ||
+			clipQueue.some(n => clipData.slug === n.slug)
+		) {
+			return;
+		}
 		clipQueue.push(clipData);
 		return;
 	}
