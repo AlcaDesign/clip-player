@@ -91,6 +91,12 @@ function api(version) {
 let helix = api('helix');
 let kraken = api('kraken');
 
+function getClipSource(id) {
+	return fetch(`https://clips.twitch.tv/api/v2/clips/${id}/status`)
+		.then(res => res.json())
+		.then(data => data.quality_options[0].source);
+}
+
 function getClips(id) {
 	return kraken('clips/' + id, {}, { Accept: 'application/vnd.twitchtv.v5+json' });
 }
