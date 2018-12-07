@@ -206,19 +206,26 @@ async function messageReceived(channel, user, message, self) {
 }
 
 window.addEventListener('load', () => {
-	qs = !location.search.length ? {} : location.search.slice(1)
-		.split('&')
-		.map(n => n.split('=').map(decodeURIComponent))
-		.reduce((p, n) => (p[n[0]] = n[1] || '', p), {});
+	qs = new URLSearchParams(location.search);
+	let getQS = (...keys) => {
+			for(let i = 0; i < keys.length; i++) {
+				let v = qs.get(keys[i]);
+				if(v !== null) {
+					return v;
+				}
+			}
+			return null;
+		};
 	
 	let truthyValues = [ 'true', '', '1', 't' ];
-	let mutedByQS = qs.muted || qs.mute;
-	if(mutedByQS !== undefined) {
+	let mutedByQS = getQS('muted', 'mute');
+	if(mutedByQS !== null) {
 		muted = truthyValues.includes(mutedByQS.toLowerCase());
 	}
-
-	let subRequiredQS = qs['sub-required'] || qs['sub-only'] || qs.subrequired || qs.subonly;
-	if(subRequiredQS !== undefined) {
+	
+	let subRequiredQS = getQS('sub-required', 'sub-only', 'subrequired',
+			'subonly');
+	if(subRequiredQS !== null) {
 		subRequired = truthyValues.includes(subRequiredQS.toLowerCase());
 	}
 	
@@ -227,7 +234,7 @@ window.addEventListener('load', () => {
 				reconnect: true,
 				secure: true
 			},
-			channels: [ qs.channel || 'pootie33' ]
+			channels: [ getQS('channel') || 'pootie33' ]
 		});
 	chatClient.on('join', (channel, user, self) =>
 			self && console.log('JOIN', channel)
@@ -236,7 +243,7 @@ window.addEventListener('load', () => {
 	chatClient.connect();
 	
 	clipEmbed = document.createElement('iframe');
-	let scale = 'scale' in qs && qs.scale.length ? +qs.scale : 5;
+	let scale = getQS('scale') || 3;
 	clipEmbed.width = 1920 / scale;
 	clipEmbed.height = 1080 / scale;
 	clipEmbed.frameBorder = 0;
