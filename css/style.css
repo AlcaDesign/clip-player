@@ -1,0 +1,13 @@
+body {
+	margin: 0;
+	overflow: hidden;
+	background-color: black;
+}
+
+#clip-attachment {
+	position: absolute;
+	right: 0;
+	top: 0;
+	transition: 350ms ease-in-out;
+	font-size: 0;
+}
