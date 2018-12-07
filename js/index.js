@@ -71,16 +71,7 @@ function api(version) {
 		let baseUrl = `https://api.twitch.tv/${version}/`;
 		let uri = baseUrl + endpoint;
 		if(qs) {
-			let queryString = Object.entries(qs)
-				.map(n => {
-					if(Array.isArray(n[1])) {
-						let key = encodeURIComponent(n[0]);
-						return n[1].map(val => [ key, encodeURIComponent(val) ].join('='));
-					}
-					return n.map(encodeURIComponent).join('=');
-				})
-				.reduce((p, n) => p.concat(n), [])
-				.join('&');
+			let queryString = new URLSearchParams(qs).toString();
 			if(queryString.length) {
 				if(!uri.includes('?')) {
 					uri += '?';
