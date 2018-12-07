@@ -228,6 +228,8 @@ window.addEventListener('load', () => {
 	if(subRequiredQS !== null) {
 		subRequired = truthyValues.includes(subRequiredQS.toLowerCase());
 	}
+
+	qs.getAll('ignore').forEach(n => ignoreNames.push(n.toLowerCase()));
 	
 	chatClient = new tmi.client({
 			connection: {
