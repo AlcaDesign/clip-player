@@ -132,7 +132,7 @@ async function messageReceived(channel, user, message, self) {
 		
 		// Mod commands
 
-		if(commandName === 'forceclip') {
+		if([ 'forceclip', 'clipforce' ].includes(commandName)) {
 			let clipMatch = args[0].match(clipsRegex);
 			if(clipMatch === null) {
 				return;
@@ -237,8 +237,8 @@ window.addEventListener('load', () => {
 		muted = truthyValues.includes(mutedByQS.toLowerCase());
 	}
 	
-	let subRequiredQS = getQS('sub-required', 'sub-only', 'subrequired',
-			'subonly');
+	let subRequiredQS = getQS('sub-only', 'subonly', 'sub-required',
+			'subrequired');
 	if(subRequiredQS !== null) {
 		subRequired = truthyValues.includes(subRequiredQS.toLowerCase());
 	}
