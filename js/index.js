@@ -54,7 +54,10 @@ function clipPlaying() {
 	clearTimeout(clipClearShow);
 	clipClearShow = setTimeout(() => attachmentPoint.style.right = '0px', 500);
 	clearTimeout(clipClearWait);
-	clipClearWait = setTimeout(closeClip, (currentClipData.duration + 2) * 1000);
+	clipClearWait = setTimeout(
+			closeClip,
+			(currentClipData.duration + 2) * 1000
+		);
 }
 
 const _headers = {
@@ -85,7 +88,7 @@ function api(version) {
 				uri += queryString;
 			}
 		}
-		let opts = { headers: new Headers(Object.assign({}, _headers, headers)) };
+		let opts = { headers: Object.assign({}, _headers, headers) };
 		return fetch(uri, opts).then(res => res.json());
 	};
 }
@@ -123,6 +126,7 @@ async function messageReceived(channel, user, message, self) {
 		}
 		let args = message.slice(1).split(' ');
 		let commandName = args.shift().toLowerCase();
+		let [ arg0 ] = args;
 		if(isSupreme && commandName === 'clipreload') {
 			location.reload();
 		}
@@ -160,10 +164,10 @@ async function messageReceived(channel, user, message, self) {
 			if(!args.length) {
 				subRequired ^= 1;
 			}
-			else if([ 'enable', 'on', 'enabled', 'start' ].includes(args[0])) {
+			else if([ 'enable', 'on', 'enabled', 'start' ].includes(arg0)) {
 				subRequired = true;
 			}
-			else if([ 'disable', 'off', 'disabled', 'stop' ].includes(args[0])) {
+			else if([ 'disable', 'off', 'disabled', 'stop' ].includes(arg0)) {
 				subRequired = false;
 			}
 			else {
@@ -203,10 +207,6 @@ async function messageReceived(channel, user, message, self) {
 		if(!clipData || clipData.error) {
 			return;
 		}
-		// let { data: [ broadcasterData ] } = await getUsers(clipData.broadcaster_id);
-		// if(!broadcasterData || broadcasterData.) {
-		// 	return;
-		// }
 		if(clipData.broadcaster.id !== user['room-id']) {
 			return;
 		}
@@ -238,7 +238,9 @@ window.addEventListener('load', () => {
 			},
 			channels: [ qs.channel || 'pootie33' ]
 		});
-	chatClient.on('join', (channel, user, self) => self && console.log('JOIN', channel));
+	chatClient.on('join', (channel, user, self) =>
+			self && console.log('JOIN', channel)
+		);
 	chatClient.on('message', messageReceived);
 	chatClient.connect();
 	
