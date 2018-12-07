@@ -4,6 +4,7 @@ let qs;
 let attachmentPoint = document.getElementById('clip-attachment');
 let clipEmbed;
 let isEnabled = true;
+let muted = false;
 let currentClipData = null;
 let clipQueue = [];
 let clipIsPlaying = false;
@@ -24,7 +25,7 @@ function playClip(clipData) {
 		return;
 	}
 	clipIsPlaying = true;
-	clipEmbed.src = clipData.embed_url + '&muted=false&autoplay=true';
+	clipEmbed.src = `${clipData.embed_url}&muted=${!!muted}&autoplay=true`;
 	currentClipData = clipData;
 }
 
@@ -139,6 +140,24 @@ async function messageReceived(channel, userstate, message, self) {
 		else if([ 'clipdisable', 'disableclip' ].includes(commandName)) {
 			isEnabled = false;
 		}
+		else if([
+			'clipmutetoggle', 'cliptogglemute', 'togglemuteclip',
+			'toggleclipmute', 'mutetoggleclip', 'mutecliptoggle'
+		].includes(commandName)) {
+			if(!muted) {
+				closeClip();
+			}
+			muted ^= 1;
+		}
+		else if([ 'clipmute', 'muteclip' ].includes(commandName)) {
+			if(!muted) {
+				closeClip();
+			}
+			muted = true;
+		}
+		else if([ 'clipunmute', 'unmuteclip' ].includes(commandName)) {
+			muted = false;
+		}
 	}
 	else if(isEnabled && clipsRegex.test(message)) {
 		let clipMatch = message.match(clipsRegex);
@@ -166,6 +185,8 @@ window.addEventListener('load', () => {
 		.split('&')
 		.map(n => n.split('=').map(decodeURIComponent))
 		.reduce((p, n) => (p[n[0]] = n[1] || '', p), {});
+	
+	muted = [ 'true', '', '1', 't' ].includes((qs.muted || qs.mute).toLowerCase());
 	
 	chatClient = new tmi.client({
 			connection: {
