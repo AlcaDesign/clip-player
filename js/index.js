@@ -61,6 +61,7 @@ const _headers = {
 		Accept: 'application/json',
 		'Client-ID': '4g5an0yjebpf93392k4c5zll7d7xcec'
 	};
+const v5Headers = { Accept: 'application/vnd.twitchtv.v5+json' };
 
 function api(version) {
 	return (endpoint, qs, headers = {}) => {
@@ -99,7 +100,7 @@ function getClipSource(id) {
 }
 
 function getClips(id) {
-	return kraken('clips/' + id, {}, { Accept: 'application/vnd.twitchtv.v5+json' });
+	return kraken('clips/' + id, {}, v5Headers);
 }
 
 function getUser(id) {
