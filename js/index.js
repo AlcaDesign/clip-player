@@ -119,7 +119,7 @@ async function messageReceived(channel, userstate, message, self) {
 		if(isSupreme && commandName === 'clipreload') {
 			location.reload();
 		}
-		else if(isSupreme && commandName === 'forceclip') {
+		else if(commandName === 'forceclip') {
 			let clipMatch = args[0].match(clipsRegex);
 			if(clipMatch === null) {
 				return;
