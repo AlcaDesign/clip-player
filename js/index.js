@@ -213,6 +213,7 @@ async function messageReceived(channel, user, message, self) {
 			muted = false;
 		}
 		else if([ 'cliptestregion' ].includes(commandName)) {
+			testAttachmentPoint.style.display = 'block';
 			let func = isShowingTest ? closeClip : clipPlaying;
 			func(testAttachmentPoint, true);
 			isShowingTest ^= 1;
