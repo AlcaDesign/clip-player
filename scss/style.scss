@@ -4,8 +4,32 @@ body {
 	background-color: black;
 }
 
+#clip-test-attachment,
 #clip-attachment {
 	position: fixed;
 	transition: 350ms ease-in-out;
 	font-size: 0;
+}
+
+#clip-test-attachment {
+	// display: none;
+	overflow: hidden;
+
+	#test-region {
+		width: 640px;
+		height: 360px;
+		box-sizing: border-box;
+		background: hsla(210, 40%, 30%, 0.4);
+		border: 8px dashed hsla(0, 0%, 0%, 0.6);
+		font-size: 24px;
+		color: white;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		word-break: break-all;
+
+		&:before {
+			content: '!cliptestregion';
+		}
+	}
 }

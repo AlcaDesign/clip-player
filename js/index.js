@@ -1,12 +1,18 @@
 const clipsRegex = /(?:twitch.tv\/\w+\/clip\/|clips.twitch.tv\/)(\w{3,})/i;
 
 let qs;
+let testAttachmentPoint = document.getElementById('clip-test-attachment');
 let attachmentPoint = document.getElementById('clip-attachment');
 let clipEmbed;
 let isEnabled = true;
 let muted = false;
 let subRequired = false;
 let animationSide = 'right';
+let width = 1920;
+let height = 1080;
+let animationOffset = -width + 'px';
+
+let isShowingTest = false;
 
 let currentClipData = null;
 let clipQueue = [];
@@ -43,8 +49,11 @@ function playNextClip() {
 	playClip(clipData);
 }
 
-function closeClip() {
-	attachmentPoint.style[animationSide] = -clipEmbed.width + 'px';
+function closeClip(ap = attachmentPoint, isTest = false) {
+	ap.style[animationSide] = animationOffset;
+	if(isTest) {
+		return;
+	}
 	clearTimeout(clipClearClose);
 	clipClearClose = setTimeout(() => {
 		clipIsPlaying = false;
@@ -55,19 +64,26 @@ function closeClip() {
 	}, 400);
 }
 
-function clipPlaying() {
-	if(new URL(clipEmbed.src).origin !== 'https://clips.twitch.tv') {
+function clipPlaying(ap = attachmentPoint, isTest = false) {
+	if(
+		!isTest &&
+		(
+			!clipEmbed.src ||
+			new URL(clipEmbed.src).origin !== 'https://clips.twitch.tv'
+		)
+	) {
 		return;
 	}
+	if(isTest) {
+		ap.style[animationSide] = '0px';
+		return;
+	}
+	const clearWait = (currentClipData.duration + 2) * 1000;
+	const clearShow = 500;
 	clearTimeout(clipClearShow);
-	clipClearShow = setTimeout(() =>
-		attachmentPoint.style[animationSide] = '0px', 500
-	);
+	clipClearShow = setTimeout(() => ap.style[animationSide] = 0, clearShow);
 	clearTimeout(clipClearWait);
-	clipClearWait = setTimeout(
-			closeClip,
-			(currentClipData.duration + 2) * 1000
-		);
+	clipClearWait = setTimeout(closeClip, clearWait);
 }
 
 const _headers = {
@@ -196,6 +212,11 @@ async function messageReceived(channel, user, message, self) {
 		else if([ 'clipunmute', 'unmuteclip' ].includes(commandName)) {
 			muted = false;
 		}
+		else if([ 'cliptestregion' ].includes(commandName)) {
+			let func = isShowingTest ? closeClip : clipPlaying;
+			func(testAttachmentPoint, true);
+			isShowingTest ^= 1;
+		}
 	}
 	else if(isEnabled && clipsRegex.test(message)) {
 		if(subRequired && !isSubUp) {
@@ -226,20 +247,30 @@ function runTest(id = 'HonestRockyLionDerp') {
 	);
 }
 
+function showTestRegion() {
+	messageReceived(
+		'#alca',
+		{ name: 'alca', mod: true, sub: true, 'room-id': '7676884' },
+		'!cliptestregion',
+		false
+	);
+}
+
 window.addEventListener('load', () => {
 	qs = new URLSearchParams(location.search);
 	let getQS = (...keys) => {
-			for(let i = 0; i < keys.length; i++) {
-				let v = qs.get(keys[i]);
-				if(v !== null) {
-					return v;
-				}
+		for(let i = 0; i < keys.length; i++) {
+			let v = qs.get(keys[i]);
+			if(v !== null) {
+				return v;
 			}
-			return null;
-		};
+		}
+		return null;
+	};
 	
 	let channel = getQS('channel');
 	if(!channel) {
+		console.log('Add a channel with "?channel=channel_name"');
 		return;
 	}
 
@@ -255,6 +286,13 @@ window.addEventListener('load', () => {
 	if(subRequiredQS !== null) {
 		subRequired = truthyValues.includes(subRequiredQS.toLowerCase());
 	}
+
+	let scale = parseInt(getQS('scale') || 3);
+	if(scale !== scale) {
+		scale = 3;
+	}
+	width = 1920 / scale;
+	height = 1080 / scale;
 
 	let animationSideQS = getQS('animation-side', 'anim-side') || 'right';
 	{
@@ -282,6 +320,14 @@ window.addEventListener('load', () => {
 			styles.top = 0;
 			styles.right = 0;
 		}
+		if([ 'left', 'right' ].includes(animationSide)) {
+			styles[animationSide] = -width + 'px';
+			animationOffset = -width + 'px';
+		}
+		else if([ 'top', 'bottom' ].includes(animationSide)) {
+			styles[animationSide] = -height + 'px';
+			animationOffset = -height + 'px';
+		}
 		Object.assign(attachmentPoint.style, styles);
 		Object.assign(testAttachmentPoint.style, styles);
 	}
@@ -302,13 +348,15 @@ window.addEventListener('load', () => {
 	chatClient.connect();
 	
 	clipEmbed = document.createElement('iframe');
-	let scale = getQS('scale') || 3;
-	clipEmbed.width = 1920 / scale;
-	clipEmbed.height = 1080 / scale;
+	clipEmbed.width = width;
+	clipEmbed.height = height;
 	clipEmbed.frameBorder = 0;
 	clipEmbed.scrolling = 'no';
 	clipEmbed.preload = 'auto';
-	attachmentPoint.style[animationSide] = -clipEmbed.width + 'px';
 	attachmentPoint.appendChild(clipEmbed);
-	clipEmbed.addEventListener('load', clipPlaying);
+	clipEmbed.addEventListener('load', () => clipPlaying());
+
+	let [ testRegion ] = testAttachmentPoint.children;
+	testRegion.style.width = width + 'px';
+	testRegion.style.height = height + 'px';
 }, false);

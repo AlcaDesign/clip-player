@@ -19,6 +19,7 @@ These commands are for channel moderators and the broadcaster.
 | !clipmutetoggle | | Toggle the mute state of the player. Will automatically skip the current clip if changing to muted state.
 | !clipmute | | Enable the mute state of the player. Similarly will skip the current clip.
 | !clipunmute | | Disable the mute state of the player.
+| !cliptestregion | | Show a test region. Useful for layout. You can see 
 
 ### Aliases
 
