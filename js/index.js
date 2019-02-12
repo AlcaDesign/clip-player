@@ -256,13 +256,12 @@ window.addEventListener('load', () => {
 		subRequired = truthyValues.includes(subRequiredQS.toLowerCase());
 	}
 
-	let animationSideQS = getQS('animation-side', 'anim-side');
-	if(animationSideQS !== null) {
+	let animationSideQS = getQS('animation-side', 'anim-side') || 'right';
+	{
+		let styles = {};
 		// Default: right
 		if([ 'top', 'bottom', 'left' ].includes(animationSideQS)) {
 			animationSide = animationSideQS;
-
-			let styles = {};
 			if([ 'top', 'left' ].includes(animationSide)) {
 				styles.top = 0;
 			}
@@ -277,12 +276,14 @@ window.addEventListener('load', () => {
 				// Left:
 				styles.left = 0;
 			}
-			Object.assign(attachmentPoint.style, styles);
 		}
 		else {
 			// Right
-			Object.assign(attachmentPoint.style, { top: 0, right: 0 });
+			styles.top = 0;
+			styles.right = 0;
 		}
+		Object.assign(attachmentPoint.style, styles);
+		Object.assign(testAttachmentPoint.style, styles);
 	}
 
 	qs.getAll('ignore').forEach(n => ignoreNames.push(n.toLowerCase()));
