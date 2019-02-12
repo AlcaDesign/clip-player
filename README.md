@@ -30,6 +30,7 @@ Commands also have a flipped order alias. For instance, `!clipskip` has `!skipcl
 | --- | --- | --- |
 | channel | | Required. Target this channel. |
 | scale | 3 | Determines how large the player will appear within the source.
+| animation-side | right | Edge the slide animation starts from. |
 | muted | false | Set the Clip embed to muted by default. |
 | sub-only | false | Require a user be subscribed, moderator, or the broadcaster in order to activate the Clip player. |
 | ignore | | One or more usernames to ignore. Use separate instaces of &ignore=\<username\> to add more. Nightbot & Moobot are already ignored. |
@@ -46,13 +47,13 @@ The source can still be scaled down in the streaming software but it won't look 
 
 `?channel=alca&scale=1.5`
 
-### Sub-Only
+### Animation-Side
 
-Required a user to be subscribed to the channel, be a moderator, or be the broadcaster in order to activate the Clip player. Can be altered 
+Choose which side the slide animation starts from. You can choose from: `top`, `right`, `bottom`, or `left`.
 
-`?channel=alca&sub-only`
+`?channel=alca&animation-side=top`
 
-*Aliases*: `subonly`, `sub-required`, `subrequired`
+*Aliases*: `anim-side`
 
 ### Muted
 
@@ -61,6 +62,14 @@ Append `&muted` to the URL to default to a muted state. No specified value is ne
 `?channel=alca&muted`
 
 *Aliases*: `mute`
+
+### Sub-Only
+
+Required a user to be subscribed to the channel, be a moderator, or be the broadcaster in order to activate the Clip player. Can be altered 
+
+`?channel=alca&sub-only`
+
+*Aliases*: `subonly`, `sub-required`, `subrequired`
 
 ### Ignore
 
