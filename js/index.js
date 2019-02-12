@@ -277,11 +277,11 @@ window.addEventListener('load', () => {
 				// Left:
 				styles.left = 0;
 			}
-			Object.assign(attachmentPoint.style);
+			Object.assign(attachmentPoint.style, styles);
 		}
 		else {
 			// Right
-			Object.assign(attachmentPoint, { top: 0, right: 0 });
+			Object.assign(attachmentPoint.style, { top: 0, right: 0 });
 		}
 	}
 
