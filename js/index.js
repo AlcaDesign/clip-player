@@ -6,6 +6,8 @@ let clipEmbed;
 let isEnabled = true;
 let muted = false;
 let subRequired = false;
+let animationSide = 'right';
+
 let currentClipData = null;
 let clipQueue = [];
 let clipIsPlaying = false;
@@ -42,7 +44,7 @@ function playNextClip() {
 }
 
 function closeClip() {
-	attachmentPoint.style.right = -clipEmbed.width + 'px';
+	attachmentPoint.style[animationSide] = -clipEmbed.width + 'px';
 	clearTimeout(clipClearClose);
 	clipClearClose = setTimeout(() => {
 		clipIsPlaying = false;
@@ -58,7 +60,9 @@ function clipPlaying() {
 		return;
 	}
 	clearTimeout(clipClearShow);
-	clipClearShow = setTimeout(() => attachmentPoint.style.right = '0px', 500);
+	clipClearShow = setTimeout(() =>
+		attachmentPoint.style[animationSide] = '0px', 500
+	);
 	clearTimeout(clipClearWait);
 	clipClearWait = setTimeout(
 			closeClip,
@@ -96,7 +100,7 @@ let kraken = api('kraken');
 function getClipSource(id) {
 	return fetch(`https://clips.twitch.tv/api/v2/clips/${id}/status`)
 		.then(res => res.json())
-		.then(data => data.quality_options[0].source);
+		// .then(data => data.quality_options[0].source);
 }
 
 function getClips(id) {
@@ -213,6 +217,15 @@ async function messageReceived(channel, user, message, self) {
 	}
 }
 
+function runTest(id = 'HonestRockyLionDerp') {
+	messageReceived(
+		'#alca',
+		{ name: 'alca', mod: true, sub: true, 'room-id': '7676884' },
+		'https://www.twitch.tv/alca/clip/' + id,
+		false
+	);
+}
+
 window.addEventListener('load', () => {
 	qs = new URLSearchParams(location.search);
 	let getQS = (...keys) => {
@@ -238,9 +251,38 @@ window.addEventListener('load', () => {
 	}
 	
 	let subRequiredQS = getQS('sub-only', 'subonly', 'sub-required',
-			'subrequired');
+		'subrequired');
 	if(subRequiredQS !== null) {
 		subRequired = truthyValues.includes(subRequiredQS.toLowerCase());
+	}
+
+	let animationSideQS = getQS('animation-side', 'anim-side');
+	if(animationSideQS !== null) {
+		// Default: right
+		if([ 'top', 'bottom', 'left' ].includes(animationSideQS)) {
+			animationSide = animationSideQS;
+
+			let styles = {};
+			if([ 'top', 'left' ].includes(animationSide)) {
+				styles.top = 0;
+			}
+			else {
+				// Bottom
+				styles.bottom = 0;
+			}
+			if([ 'top', 'bottom' ].includes(animationSide)) {
+				styles.right = 0;
+			}
+			else {
+				// Left:
+				styles.left = 0;
+			}
+			Object.assign(attachmentPoint.style);
+		}
+		else {
+			// Right
+			Object.assign(attachmentPoint, { top: 0, right: 0 });
+		}
 	}
 
 	qs.getAll('ignore').forEach(n => ignoreNames.push(n.toLowerCase()));
@@ -265,7 +307,7 @@ window.addEventListener('load', () => {
 	clipEmbed.frameBorder = 0;
 	clipEmbed.scrolling = 'no';
 	clipEmbed.preload = 'auto';
-	attachmentPoint.style.right = -clipEmbed.width + 'px';
+	attachmentPoint.style[animationSide] = -clipEmbed.width + 'px';
 	attachmentPoint.appendChild(clipEmbed);
 	clipEmbed.addEventListener('load', clipPlaying);
 }, false);
