@@ -4,6 +4,8 @@ Links to Clips that are posted in the chat will automatically queue and play on 
 
 Note the future changes in the "To Do" section. Many of these will be breaking changes.
 
+Here is a hosted version that you may use: `https://static.alca.tv/twitch/f/projects/clip-player/v1/`, just add the query string parameters as needed from below.
+
 ## Chat Commands
 
 These commands are for channel moderators and the broadcaster.
