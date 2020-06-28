@@ -40,7 +40,12 @@ function playClip(clipData) {
 		return;
 	}
 	clipIsPlaying = true;
-	clipEmbed.src = `${clipData.embed_url}&muted=${!!muted}&autoplay=true`;
+	const qs = new URLSearchParams({
+		muted: !!muted,
+		autoplay: 'true',
+		parent: location.hostname
+	});
+	clipEmbed.src = `${clipData.embed_url}&${qs}`;
 	currentClipData = clipData;
 }
 
