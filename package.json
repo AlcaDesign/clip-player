@@ -2,19 +2,33 @@
   "name": "clip-player",
   "version": "1.0.1",
   "description": "Links to Clips that are posted in the chat will automatically queue and play on the stream.",
-  "main": "",
+  "main": "api/server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node --experimental-fetch -r dotenv/config api/server.js"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/AlcaDesign/clip-player.git"
   },
-  "keywords": [ "twitch", "chat", "clips", "stream", "embed", "overlay" ],
+  "keywords": [
+    "twitch",
+    "chat",
+    "clips",
+    "stream",
+    "embed",
+    "overlay"
+  ],
   "author": "Jacob Foster",
   "license": "GPL-3.0-or-later",
   "bugs": {
     "url": "https://github.com/AlcaDesign/clip-player/issues"
   },
-  "homepage": "https://github.com/AlcaDesign/clip-player#readme"
+  "homepage": "https://github.com/AlcaDesign/clip-player#readme",
+  "dependencies": {
+    "express": "^4.17.3"
+  },
+  "devDependencies": {
+    "dotenv": "^16.0.0"
+  }
 }
